@@ -8,6 +8,8 @@ import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import io.ktor.server.application.*
 import io.ktor.server.config.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -18,7 +20,7 @@ object DatabaseFactory {
     private val dbUrl = System.getenv("DB_POSTGRES_URL")
     private val dbUser = System.getenv("DB_POSTGRES_USER")
     private val dbPassword = System.getenv("DB_PASSWORD")
-    
+
     fun Application.initializationDatabase() {
         Database.connect(datasource = getHikariDatasource())
 
@@ -47,7 +49,10 @@ object DatabaseFactory {
             validate()
         }
         return HikariDataSource(config)
+    }
 
+    suspend fun <T> dbQuery(block: () -> T): T = withContext(Dispatchers.IO) {
+        transaction { block() }
     }
 }
 

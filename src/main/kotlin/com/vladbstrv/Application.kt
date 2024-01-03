@@ -13,8 +13,8 @@ fun main() {
 
 fun Application.module() {
     initializationDatabase()
-//    configureSerialization()
-//    configureMonitoring()
-//    configureSecurity()
+    configureMonitoring()
+    configureSerialization()
+    configureSecurity()
 //    configureRouting()
 }
