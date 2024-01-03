@@ -6,7 +6,7 @@ interface ClientRepository {
 
     suspend fun addClient(client: ClientModel)
 
-    suspend fun getAllClients(): List<ClientModel>
+    suspend fun getAllClients(userId: Int): List<ClientModel>
 
     suspend fun getClientByPhoneNumber(phoneNumber: String, ownerId: Int): ClientModel?
 

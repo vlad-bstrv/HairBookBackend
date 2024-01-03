@@ -21,8 +21,10 @@ class ClientRepositoryImpl : ClientRepository {
         }
     }
 
-    override suspend fun getAllClients(): List<ClientModel> = dbQuery {
-        ClientTable.selectAll()
+    override suspend fun getAllClients(userId: Int): List<ClientModel> = dbQuery {
+        ClientTable.select {
+            (ClientTable.owner.eq(userId))
+        }
             .mapNotNull { rowToClient(it) }
     }
 

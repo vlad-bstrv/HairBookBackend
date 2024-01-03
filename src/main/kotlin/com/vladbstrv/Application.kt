@@ -27,5 +27,5 @@ fun Application.module() {
     configureMonitoring()
     configureSerialization()
     configureSecurity(userUseCase)
-//    configureRouting()
+    configureRouting(userUseCase, clientUseCase)
 }

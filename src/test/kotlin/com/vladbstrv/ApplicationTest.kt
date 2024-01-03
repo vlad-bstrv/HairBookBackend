@@ -11,7 +11,7 @@ class ApplicationTest {
     @Test
     fun testRoot() = testApplication {
         application {
-            configureRouting()
+            configureRouting(userUseCase, clientUseCase)
         }
         client.get("/").apply {
             assertEquals(HttpStatusCode.OK, status)

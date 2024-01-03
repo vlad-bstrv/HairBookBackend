@@ -9,7 +9,7 @@ class ClientUseCase(
 
     suspend fun addClient(client: ClientModel) = clientRepository.addClient(client)
 
-    suspend fun getAllClients() = clientRepository.getAllClients()
+    suspend fun getAllClients(userId: Int) = clientRepository.getAllClients(userId)
 
     suspend fun updateClient(client: ClientModel, ownerId: Int) = clientRepository.updateClient(client, ownerId)
 
