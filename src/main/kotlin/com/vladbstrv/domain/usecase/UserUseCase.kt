@@ -1,5 +1,6 @@
 package com.vladbstrv.domain.usecase
 
+import com.auth0.jwt.JWTVerifier
 import com.vladbstrv.authentification.JwtService
 import com.vladbstrv.data.model.UserModel
 import com.vladbstrv.domain.repository.UserRepository
@@ -14,4 +15,6 @@ class UserUseCase(
     suspend fun findUserByEmail(email: String) = repository.getUserByEmail(email)
 
     fun generateToken(user: UserModel): String = jwtService.generateToken(user)
+
+    fun getGwtVerifier(): JWTVerifier = jwtService.getVerifier()
 }
