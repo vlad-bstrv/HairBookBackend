@@ -1,6 +1,7 @@
 package com.vladbstrv
 
 import com.vladbstrv.plugins.*
+import com.vladbstrv.plugins.DatabaseFactory.initializationDatabase
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
@@ -11,9 +12,9 @@ fun main() {
 }
 
 fun Application.module() {
-    configureSerialization()
-    configureDatabases()
-    configureMonitoring()
-    configureSecurity()
-    configureRouting()
+    initializationDatabase()
+//    configureSerialization()
+//    configureMonitoring()
+//    configureSecurity()
+//    configureRouting()
 }
