@@ -30,10 +30,10 @@ class ClientRepositoryImpl : ClientRepository {
 
     override suspend fun getClientByPhoneNumber(phoneNumber: String, ownerId: Int) = dbQuery {
         ClientTable.select {
-            (ClientTable.owner.eq(ownerId) and ClientTable.phoneNumber.eq(phoneNumber))
+            ((ClientTable.owner.eq(ownerId)) and (ClientTable.phoneNumber like "$phoneNumber%"))
         }
-            .map { rowToClient(it) }
-            .singleOrNull()
+            .mapNotNull { rowToClient(it) }
+
     }
 
 
@@ -57,7 +57,7 @@ class ClientRepositoryImpl : ClientRepository {
     override suspend fun deleteClient(clientId: Int, ownerId: Int) {
         dbQuery {
             ClientTable.deleteWhere {
-                ClientTable.id.eq(clientId) and ClientTable.owner.eq(ownerId)
+                id.eq(clientId) and owner.eq(ownerId)
             }
         }
     }

@@ -34,10 +34,8 @@ fun Route.clientRoute(clientUseCase: ClientUseCase) {
             }
             try {
                 val userId = call.principal<UserModel>()!!.id
-                val client = clientUseCase.getClientByPhoneNumber(clientPhoneNumberRequest, userId)
-                if (client != null) {
-                    call.respond(HttpStatusCode.OK, client)
-                }
+                val clients = clientUseCase.getClientByPhoneNumber(clientPhoneNumberRequest, userId)
+                call.respond(HttpStatusCode.OK, clients)
             } catch (e: Exception) {
                 call.respond(HttpStatusCode.Conflict, BaseResponse(false, e.message ?: Constants.Error.GENERAL))
             }
