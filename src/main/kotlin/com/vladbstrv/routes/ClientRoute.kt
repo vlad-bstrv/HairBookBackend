@@ -28,87 +28,73 @@ fun Route.clientRoute(clientUseCase: ClientUseCase) {
         }
 
         get("api/v1/get-clients-by-phone-number") {
-            val clientPhoneNumberRequest = call.request.queryParameters["phoneNumber"] ?: kotlin.run {
-                call.respond(HttpStatusCode.BadRequest, BaseResponse(false, Constants.Error.MISSING_FIELDS))
-                return@get
-            }
-            try {
-                val userId = call.principal<UserModel>()!!.id
-                val clients = clientUseCase.getClientByPhoneNumber(clientPhoneNumberRequest, userId)
-                call.respond(HttpStatusCode.OK, clients)
-            } catch (e: Exception) {
-                call.respond(HttpStatusCode.Conflict, BaseResponse(false, e.message ?: Constants.Error.GENERAL))
+            call.request.queryParameters["phoneNumber"]?.let {
+                try {
+                    val userId = call.principal<UserModel>()!!.id
+                    val clients = clientUseCase.getClientByPhoneNumber(it, userId)
+                    call.respond(HttpStatusCode.OK, clients)
+                } catch (e: Exception) {
+                    call.respond(HttpStatusCode.Conflict, BaseResponse(false, e.message ?: Constants.Error.GENERAL))
+                }
             }
         }
 
         post("api/v1/create-client") {
-            val clientRequest = call.receiveNullable<AddClientRequest>() ?: kotlin.run {
-                call.respond(HttpStatusCode.BadRequest, BaseResponse(false, Constants.Error.MISSING_FIELDS))
-                return@post
-            }
-
-            try {
-                val client = ClientModel(
-                    owner = call.principal<UserModel>()!!.id,
-                    firstName = clientRequest.firstName,
-                    lastName = clientRequest.lastName,
-                    phoneNumber = clientRequest.phoneNumber,
-                    comment = clientRequest.comment,
-                )
-
-                clientUseCase.addClient(client)
-                call.respond(HttpStatusCode.OK, BaseResponse(true, Constants.Success.ADDED_SUCCESSFULLY))
-
-            } catch (e: Exception) {
-                call.respond(HttpStatusCode.Conflict, BaseResponse(false, e.message ?: Constants.Error.GENERAL))
+            call.receiveNullable<AddClientRequest>()?.let {
+                try {
+                    val client = ClientModel(
+                        owner = call.principal<UserModel>()!!.id,
+                        firstName = it.firstName,
+                        lastName = it.lastName,
+                        phoneNumber = it.phoneNumber,
+                        comment = it.comment,
+                    )
+                    clientUseCase.addClient(client)
+                    call.respond(HttpStatusCode.OK, BaseResponse(true, Constants.Success.ADDED_SUCCESSFULLY))
+                } catch (e: Exception) {
+                    call.respond(HttpStatusCode.Conflict, BaseResponse(false, e.message ?: Constants.Error.GENERAL))
+                }
             }
         }
 
         post("api/v1/update-client") {
-            val clientRequest = call.receiveNullable<AddClientRequest>() ?: kotlin.run {
-                call.respond(HttpStatusCode.BadRequest, BaseResponse(false, Constants.Error.MISSING_FIELDS))
-                return@post
-            }
+            call.receiveNullable<AddClientRequest>()?.let {
+                try {
+                    val ownedId = call.principal<UserModel>()!!.id
+                    val client = ClientModel(
+                        id = it.id,
+                        owner = ownedId,
+                        firstName = it.firstName,
+                        lastName = it.lastName,
+                        phoneNumber = it.phoneNumber,
+                        comment = it.comment,
+                    )
 
-            try {
-                val ownedId = call.principal<UserModel>()!!.id
-                val client = ClientModel(
-                    id = clientRequest.id ?: 0,
-                    owner = ownedId,
-                    firstName = clientRequest.firstName,
-                    lastName = clientRequest.lastName,
-                    phoneNumber = clientRequest.phoneNumber,
-                    comment = clientRequest.comment,
-                )
+                    clientUseCase.updateClient(client, ownedId)
+                    call.respond(HttpStatusCode.OK, BaseResponse(true, Constants.Success.UPDATE_SUCCESSFULLY))
 
-                clientUseCase.updateClient(client, ownedId)
-                call.respond(HttpStatusCode.OK, BaseResponse(true, Constants.Success.UPDATE_SUCCESSFULLY))
-
-            } catch (e: Exception) {
-                call.respond(HttpStatusCode.Conflict, BaseResponse(false, e.message ?: Constants.Error.GENERAL))
+                } catch (e: Exception) {
+                    call.respond(HttpStatusCode.Conflict, BaseResponse(false, e.message ?: Constants.Error.GENERAL))
+                }
             }
         }
 
         delete("api/v1/delete-client") {
-            val clientRequest = call.request.queryParameters["id"]?.toInt() ?: kotlin.run {
-                call.respond(HttpStatusCode.BadRequest, BaseResponse(false, Constants.Error.MISSING_FIELDS))
-                return@delete
-            }
+            call.request.queryParameters["id"]?.let {
+                try {
+                    val ownedId = call.principal<UserModel>()!!.id
 
-            try {
-                val ownedId = call.principal<UserModel>()!!.id
+                    val resultDeleteClient = clientUseCase.deleteClient(it.toInt(), ownedId)
+                    if (resultDeleteClient) {
+                        call.respond(HttpStatusCode.OK, BaseResponse(true, Constants.Success.DELETE_SUCCESSFULLY))
+                    } else {
+                        call.respond(HttpStatusCode.NotFound, BaseResponse(false, Constants.Error.USER_NOT_FOUND))
+                    }
 
-                val resultDeleteClient = clientUseCase.deleteClient(clientRequest, ownedId)
-                if (resultDeleteClient) {
-                    call.respond(HttpStatusCode.OK, BaseResponse(true, Constants.Success.DELETE_SUCCESSFULLY))
-                } else {
-                    call.respond(HttpStatusCode.NotFound, BaseResponse(false, Constants.Error.USER_NOT_FOUND))
+                } catch (e: Exception) {
+                    call.respond(HttpStatusCode.Conflict, BaseResponse(false, e.message ?: Constants.Error.GENERAL))
                 }
-
-            } catch (e: Exception) {
-                call.respond(HttpStatusCode.Conflict, BaseResponse(false, e.message ?: Constants.Error.GENERAL))
             }
         }
     }
-
 }

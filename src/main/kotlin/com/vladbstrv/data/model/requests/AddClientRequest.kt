@@ -4,7 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class AddClientRequest(
-    val id: Int? = null,
+    val id: Int = 0,
     val firstName: String = "",
     val lastName: String = "",
     val phoneNumber: String,
