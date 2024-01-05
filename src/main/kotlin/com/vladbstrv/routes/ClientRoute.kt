@@ -98,8 +98,12 @@ fun Route.clientRoute(clientUseCase: ClientUseCase) {
             try {
                 val ownedId = call.principal<UserModel>()!!.id
 
-                clientUseCase.deleteClient(clientRequest, ownedId)
-                call.respond(HttpStatusCode.OK, BaseResponse(true, Constants.Success.DELETE_SUCCESSFULLY))
+                val resultDeleteClient = clientUseCase.deleteClient(clientRequest, ownedId)
+                if (resultDeleteClient) {
+                    call.respond(HttpStatusCode.OK, BaseResponse(true, Constants.Success.DELETE_SUCCESSFULLY))
+                } else {
+                    call.respond(HttpStatusCode.NotFound, BaseResponse(false, Constants.Error.USER_NOT_FOUND))
+                }
 
             } catch (e: Exception) {
                 call.respond(HttpStatusCode.Conflict, BaseResponse(false, e.message ?: Constants.Error.GENERAL))

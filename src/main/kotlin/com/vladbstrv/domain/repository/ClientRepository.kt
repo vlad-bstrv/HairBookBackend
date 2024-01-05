@@ -11,5 +11,5 @@ interface ClientRepository {
     suspend fun getClientByPhoneNumber(phoneNumber: String, ownerId: Int): List<ClientModel>
 
     suspend fun updateClient(client: ClientModel, ownerId: Int)
-    suspend fun deleteClient(clientId: Int, ownerId: Int)
+    suspend fun deleteClient(clientId: Int, ownerId: Int): Boolean
 }

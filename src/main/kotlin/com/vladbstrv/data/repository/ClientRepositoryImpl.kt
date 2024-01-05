@@ -54,15 +54,17 @@ class ClientRepositoryImpl : ClientRepository {
         }
     }
 
-    override suspend fun deleteClient(clientId: Int, ownerId: Int) {
-        dbQuery {
+    override suspend fun deleteClient(clientId: Int, ownerId: Int): Boolean {
+        val result = dbQuery {
             ClientTable.deleteWhere {
                 id.eq(clientId) and owner.eq(ownerId)
             }
         }
+
+        return result > 0
     }
 
-    private fun rowToClient(row: ResultRow?): ClientModel? {
+        private fun rowToClient(row: ResultRow?): ClientModel? {
         if (row == null) return null
 
         return ClientModel(
