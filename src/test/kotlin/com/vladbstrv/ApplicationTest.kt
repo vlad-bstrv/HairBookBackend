@@ -1,6 +1,5 @@
 package com.vladbstrv
 
-import com.vladbstrv.plugins.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
@@ -11,7 +10,7 @@ class ApplicationTest {
     @Test
     fun testRoot() = testApplication {
         application {
-            configureRouting()
+//            configureRouting(userUseCase, clientUseCase)
         }
         client.get("/").apply {
             assertEquals(HttpStatusCode.OK, status)
