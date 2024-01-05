@@ -1,11 +1,10 @@
 package com.vladbstrv.data.model
 
 import kotlinx.serialization.Serializable
-import java.time.LocalDateTime
 
 @Serializable
 data class ClientModel(
-    val id: Int,
+    val id: Int = 0,
     val owner: Int,
     val firstName: String = "",
     val lastName: String = "",

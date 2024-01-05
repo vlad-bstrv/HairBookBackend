@@ -27,6 +27,22 @@ fun Route.clientRoute(clientUseCase: ClientUseCase) {
             }
         }
 
+        get("api/v1/get-clients-by-phone-number") {
+            val clientPhoneNumberRequest = call.request.queryParameters["phoneNumber"] ?: kotlin.run {
+                call.respond(HttpStatusCode.BadRequest, BaseResponse(false, Constants.Error.MISSING_FIELDS))
+                return@get
+            }
+            try {
+                val userId = call.principal<UserModel>()!!.id
+                val client = clientUseCase.getClientByPhoneNumber(clientPhoneNumberRequest, userId)
+                if (client != null) {
+                    call.respond(HttpStatusCode.OK, client)
+                }
+            } catch (e: Exception) {
+                call.respond(HttpStatusCode.Conflict, BaseResponse(false, e.message ?: Constants.Error.GENERAL))
+            }
+        }
+
         post("api/v1/create-client") {
             val clientRequest = call.receiveNullable<AddClientRequest>() ?: kotlin.run {
                 call.respond(HttpStatusCode.BadRequest, BaseResponse(false, Constants.Error.MISSING_FIELDS))
@@ -35,7 +51,6 @@ fun Route.clientRoute(clientUseCase: ClientUseCase) {
 
             try {
                 val client = ClientModel(
-                    id = 0,
                     owner = call.principal<UserModel>()!!.id,
                     firstName = clientRequest.firstName,
                     lastName = clientRequest.lastName,

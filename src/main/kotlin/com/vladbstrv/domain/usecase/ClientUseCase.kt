@@ -11,6 +11,9 @@ class ClientUseCase(
 
     suspend fun getAllClients(userId: Int) = clientRepository.getAllClients(userId)
 
+    suspend fun getClientByPhoneNumber(phoneNumber: String, ownerId: Int) = clientRepository
+        .getClientByPhoneNumber(phoneNumber, ownerId)
+
     suspend fun updateClient(client: ClientModel, ownerId: Int) = clientRepository.updateClient(client, ownerId)
 
     suspend fun deleteClient(clientId: Int, ownerId: Int) = clientRepository.deleteClient(clientId, ownerId)
