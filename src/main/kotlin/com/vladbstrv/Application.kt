@@ -2,8 +2,10 @@ package com.vladbstrv
 
 import com.vladbstrv.authentification.JwtService
 import com.vladbstrv.data.repository.ClientRepositoryImpl
+import com.vladbstrv.data.repository.ServiceRepositoryImpl
 import com.vladbstrv.data.repository.UserRepositoryImpl
 import com.vladbstrv.domain.usecase.ClientUseCase
+import com.vladbstrv.domain.usecase.ServiceUseCase
 import com.vladbstrv.domain.usecase.UserUseCase
 import com.vladbstrv.plugins.*
 import com.vladbstrv.plugins.DatabaseFactory.initializationDatabase
@@ -23,9 +25,12 @@ fun Application.module() {
     val userUseCase = UserUseCase(userRepository, jwtService)
     val clientUseCase = ClientUseCase(clientRepository)
 
+    val serviceRepository = ServiceRepositoryImpl()
+    val serviceUseCase = ServiceUseCase(serviceRepository)
+
     initializationDatabase()
     configureMonitoring()
     configureSerialization()
     configureSecurity(userUseCase)
-    configureRouting(userUseCase, clientUseCase)
+    configureRouting(userUseCase, clientUseCase, serviceUseCase)
 }
