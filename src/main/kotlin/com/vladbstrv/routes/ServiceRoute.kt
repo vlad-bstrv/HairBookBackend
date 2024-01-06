@@ -44,5 +44,44 @@ fun Route.serviceRoute(serviceUseCase: ServiceUseCase) {
                 }
             }
         }
+
+        post("api/v1/update-service") {
+            call.receiveNullable<AddServiceRequest>()?.let {
+                try {
+                    val ownedId = call.principal<UserModel>()!!.id
+                    val service = ServiceModel(
+                        id = it.id,
+                        owner = call.principal<UserModel>()!!.id,
+                        name = it.name,
+                        price = it.price,
+                        time = it.time
+                    )
+
+                    serviceUseCase.updateService(service, ownedId)
+                    call.respond(HttpStatusCode.OK, BaseResponse(true, Constants.Success.UPDATE_SUCCESSFULLY))
+
+                } catch (e: Exception) {
+                    call.respond(HttpStatusCode.Conflict, BaseResponse(false, e.message ?: Constants.Error.GENERAL))
+                }
+            }
+        }
+
+        delete("api/v1/delete-service") {
+            call.request.queryParameters["id"]?.let {
+                try {
+                    val ownedId = call.principal<UserModel>()!!.id
+
+                    val resultDeleteService = serviceUseCase.deleteService(it.toInt(), ownedId)
+                    if (resultDeleteService) {
+                        call.respond(HttpStatusCode.OK, BaseResponse(true, Constants.Success.DELETE_SUCCESSFULLY))
+                    } else {
+                        call.respond(HttpStatusCode.NotFound, BaseResponse(false, Constants.Error.USER_NOT_FOUND))
+                    }
+
+                } catch (e: Exception) {
+                    call.respond(HttpStatusCode.Conflict, BaseResponse(false, e.message ?: Constants.Error.GENERAL))
+                }
+            }
+        }
     }
 }

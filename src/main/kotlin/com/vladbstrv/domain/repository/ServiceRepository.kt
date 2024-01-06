@@ -7,4 +7,8 @@ interface ServiceRepository {
     suspend fun getAllServices(userId: Int): List<ServiceModel>
 
     suspend fun insertService(service: ServiceModel)
+
+    suspend fun updateService(service: ServiceModel, ownerId: Int): ServiceModel
+
+    suspend fun deleteService(serviceId: Int, ownerId: Int): Boolean
 }
