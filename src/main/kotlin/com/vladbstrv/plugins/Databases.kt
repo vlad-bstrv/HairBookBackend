@@ -3,6 +3,7 @@ package com.vladbstrv.plugins
 import com.typesafe.config.ConfigFactory
 import com.vladbstrv.data.model.tables.AppointmentTable
 import com.vladbstrv.data.model.tables.ClientTable
+import com.vladbstrv.data.model.tables.ServiceTable
 import com.vladbstrv.data.model.tables.UserTable
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
@@ -28,7 +29,8 @@ object DatabaseFactory {
             SchemaUtils.create(
                 UserTable,
                 ClientTable,
-                AppointmentTable
+                AppointmentTable,
+                ServiceTable
             )
         }
     }
