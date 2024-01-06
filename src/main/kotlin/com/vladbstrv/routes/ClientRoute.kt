@@ -17,7 +17,7 @@ fun Route.clientRoute(clientUseCase: ClientUseCase) {
 
     authenticate("jwt") {
 
-        get("api/v1/get-all-clients") {
+        get("/client") {
             try {
                 val userId = call.principal<UserModel>()!!.id
                 val clients = clientUseCase.getAllClients(userId)
@@ -27,7 +27,7 @@ fun Route.clientRoute(clientUseCase: ClientUseCase) {
             }
         }
 
-        get("api/v1/get-clients-by-phone-number") {
+        get("/client/{phoneNumber}") {
             call.request.queryParameters["phoneNumber"]?.let {
                 try {
                     val userId = call.principal<UserModel>()!!.id
@@ -39,7 +39,7 @@ fun Route.clientRoute(clientUseCase: ClientUseCase) {
             }
         }
 
-        post("api/v1/create-client") {
+        post("/client") {
             call.receiveNullable<AddClientRequest>()?.let {
                 try {
                     val client = ClientModel(
@@ -57,7 +57,7 @@ fun Route.clientRoute(clientUseCase: ClientUseCase) {
             }
         }
 
-        post("api/v1/update-client") {
+        put("/client") {
             call.receiveNullable<AddClientRequest>()?.let {
                 try {
                     val ownedId = call.principal<UserModel>()!!.id
@@ -79,8 +79,8 @@ fun Route.clientRoute(clientUseCase: ClientUseCase) {
             }
         }
 
-        delete("api/v1/delete-client") {
-            call.request.queryParameters["id"]?.let {
+        delete("/client/{id?}") {
+            call.parameters["id"]?.let {
                 try {
                     val ownedId = call.principal<UserModel>()!!.id
 

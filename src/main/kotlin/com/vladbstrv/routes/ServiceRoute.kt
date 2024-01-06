@@ -17,7 +17,7 @@ fun Route.serviceRoute(serviceUseCase: ServiceUseCase) {
 
     authenticate("jwt") {
 
-        get("api/v1/get-all-services") {
+        get("/service") {
             try {
                 val userId = call.principal<UserModel>()!!.id
                 val services = serviceUseCase.getAllServices(userId)
@@ -27,7 +27,7 @@ fun Route.serviceRoute(serviceUseCase: ServiceUseCase) {
             }
         }
 
-        post("api/v1/create-service") {
+        post("/service") {
             call.receiveNullable<AddServiceRequest>()?.let {
                 try {
                     val service = ServiceModel(
@@ -45,7 +45,8 @@ fun Route.serviceRoute(serviceUseCase: ServiceUseCase) {
             }
         }
 
-        post("api/v1/update-service") {
+
+        put("/service") {
             call.receiveNullable<AddServiceRequest>()?.let {
                 try {
                     val ownedId = call.principal<UserModel>()!!.id
@@ -66,8 +67,8 @@ fun Route.serviceRoute(serviceUseCase: ServiceUseCase) {
             }
         }
 
-        delete("api/v1/delete-service") {
-            call.request.queryParameters["id"]?.let {
+        delete("/service/{id?}") {
+            call.parameters["id"]?.let {
                 try {
                     val ownedId = call.principal<UserModel>()!!.id
 

@@ -16,9 +16,11 @@ fun Application.configureRouting(
 ) {
 
     routing {
-        userRoute(userUseCase)
-        clientRoute(clientUseCase)
-        serviceRoute(serviceUseCase)
+        route("api/v1") {
+            userRoute(userUseCase)
+            clientRoute(clientUseCase)
+            serviceRoute(serviceUseCase)
+        }
     }
 }
 
