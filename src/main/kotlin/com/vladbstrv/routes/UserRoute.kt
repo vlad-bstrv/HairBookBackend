@@ -5,6 +5,7 @@ import com.vladbstrv.data.model.UserModel
 import com.vladbstrv.data.model.getRoleByString
 import com.vladbstrv.data.model.requests.LoginRequest
 import com.vladbstrv.data.model.requests.RegisterRequest
+import com.vladbstrv.data.model.requests.UserRequest
 import com.vladbstrv.data.model.response.BaseResponse
 import com.vladbstrv.domain.usecase.UserUseCase
 import com.vladbstrv.utils.Constants
@@ -19,7 +20,7 @@ fun Route.userRoute(userUseCase: UserUseCase) {
 
     val hashFunction = { p: String -> hash(password = p) }
 
-    post("api/v1/signup") {
+    post("signup") {
         val registerRequest = call.receiveNullable<RegisterRequest>() ?: kotlin.run {
             call.respond(HttpStatusCode.BadRequest, BaseResponse(false, Constants.Error.GENERAL))
             return@post
@@ -47,7 +48,7 @@ fun Route.userRoute(userUseCase: UserUseCase) {
         }
     }
 
-    post("api/v1/signin") {
+    post("/signin") {
         val loginRequest = call.receiveNullable<LoginRequest>() ?: kotlin.run {
             call.respond(HttpStatusCode.BadRequest, BaseResponse(false, Constants.Error.GENERAL))
             return@post
@@ -79,12 +80,19 @@ fun Route.userRoute(userUseCase: UserUseCase) {
     }
 
     authenticate("jwt") {
-        get("api/v1/get-user-info") {
+        get("/user") {
             try {
                 val user = call.principal<UserModel>()
 
                 if (user != null) {
-                    call.respond(HttpStatusCode.OK, user)
+                    call.respond(HttpStatusCode.OK, UserRequest(
+                        id = user.id,
+                        email = user.email,
+                        login = user.login,
+                        firstName = user.firstName,
+                        lastName = user.lastName,
+                        role = user.role
+                    ))
                 } else {
                     call.respond(HttpStatusCode.Conflict, BaseResponse(false, Constants.Error.USER_NOT_FOUND))
                 }
