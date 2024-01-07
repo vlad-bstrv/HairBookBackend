@@ -1,10 +1,7 @@
 package com.vladbstrv.plugins
 
 import com.typesafe.config.ConfigFactory
-import com.vladbstrv.data.model.tables.AppointmentTable
-import com.vladbstrv.data.model.tables.ClientTable
-import com.vladbstrv.data.model.tables.ServiceTable
-import com.vladbstrv.data.model.tables.UserTable
+import com.vladbstrv.data.model.tables.*
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import io.ktor.server.application.*
@@ -30,7 +27,8 @@ object DatabaseFactory {
                 UserTable,
                 ClientTable,
                 AppointmentTable,
-                ServiceTable
+                ServiceTable,
+                WorkingDayTable
             )
         }
     }
