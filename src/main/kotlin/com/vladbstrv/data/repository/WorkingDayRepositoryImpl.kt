@@ -42,11 +42,11 @@ class WorkingDayRepositoryImpl : WorkingDayRepository {
             .singleOrNull()
     }
 
-    override suspend fun updateWorkingDay(workingDayModel: WorkingDayModel, ownerId: Int): Boolean {
+    override suspend fun updateWorkingDay(workingDayModel: WorkingDayModel): Boolean {
         val result = dbQuery {
             WorkingDayTable.update(
                 where = {
-                    WorkingDayTable.ownerId.eq(ownerId) and WorkingDayTable.id.eq(workingDayModel.id)
+                    WorkingDayTable.ownerId.eq(workingDayModel.ownerId) and WorkingDayTable.id.eq(workingDayModel.id)
                 }
             ) { table ->
                 table[date] = workingDayModel.date.toJavaLocalDate()
