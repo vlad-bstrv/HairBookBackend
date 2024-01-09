@@ -11,8 +11,8 @@ class WorkingDayUseCase(private val repository: WorkingDayRepository) {
 
     suspend fun getById(id: Int, ownerId: Int) = repository.getWorkingDayById(id, ownerId)
 
-    suspend fun update(workingDayModel: WorkingDayModel, ownerId: Int) =
-        repository.updateWorkingDay(workingDayModel, ownerId)
+    suspend fun update(workingDayModel: WorkingDayModel) =
+        repository.updateWorkingDay(workingDayModel)
 
     suspend fun delete(id: Int, ownerId: Int) = repository.deleteWorkingDay(id, ownerId)
 }

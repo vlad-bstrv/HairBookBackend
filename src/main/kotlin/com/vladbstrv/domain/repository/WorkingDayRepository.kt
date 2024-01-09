@@ -10,7 +10,7 @@ interface WorkingDayRepository {
 
     suspend fun getWorkingDayById(id: Int, ownerId: Int): WorkingDayModel?
 
-    suspend fun updateWorkingDay(workingDayModel: WorkingDayModel, ownerId: Int): Boolean
+    suspend fun updateWorkingDay(workingDayModel: WorkingDayModel): Boolean
 
     suspend fun deleteWorkingDay(id: Int, ownerId: Int): Boolean
 }
