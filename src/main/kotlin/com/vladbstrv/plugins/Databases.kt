@@ -28,7 +28,10 @@ object DatabaseFactory {
                 ClientTable,
                 AppointmentTable,
                 ServiceTable,
-                WorkingDayTable
+                WorkingDayTable,
+                AppointmentTable,
+                AppointmentServicesJunctionTable,
+                TestTestTable
             )
         }
     }

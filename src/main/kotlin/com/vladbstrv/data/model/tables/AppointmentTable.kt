@@ -1,16 +1,17 @@
 package com.vladbstrv.data.model.tables
 
-import com.vladbstrv.data.model.tables.UserTable.autoIncrement
-import com.vladbstrv.plugins.UserService.Users.references
-import org.jetbrains.exposed.sql.Column
+import org.jetbrains.exposed.dao.id.IntIdTable
 import org.jetbrains.exposed.sql.Table
+import org.jetbrains.exposed.sql.javatime.time
 
-object AppointmentTable: Table() {
-    val id = integer("id").autoIncrement()
-    val owner= integer("appointment_owner").references(UserTable.id)
-    val client = integer("client_id").references(ClientTable.id)
-    val date = varchar("create_date", 50)
-    val comment = varchar("comment", 200).nullable()
+object AppointmentTable: IntIdTable() {
+    val owner = integer("client_owner").references(UserTable.id)
+    val workingDayId = integer("working_day_id_app").references(WorkingDayTable.id)
+    val startTime = time("start_time")
+}
+object AppointmentServicesJunctionTable: Table() {
+    val appointment = reference("appointment", AppointmentTable.id)
+    val service = reference("service", ServiceTable.id)
 
-    override val primaryKey: PrimaryKey = PrimaryKey(id)
+    override val primaryKey = PrimaryKey(appointment, service, name = "PK_AppointmentServices")
 }

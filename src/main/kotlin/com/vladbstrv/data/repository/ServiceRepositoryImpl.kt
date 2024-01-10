@@ -44,6 +44,7 @@ class ServiceRepositoryImpl : ServiceRepository {
                 table[name] = service.name
                 table[price] = service.price
                 table[time] = service.time.toJavaLocalTime()
+
             }
         }
 
