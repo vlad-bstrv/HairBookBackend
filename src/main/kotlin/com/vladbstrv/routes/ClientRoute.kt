@@ -28,7 +28,7 @@ fun Route.clientRoute(clientUseCase: ClientUseCase) {
         }
 
         get("/client/{phoneNumber}") {
-            call.request.queryParameters["phoneNumber"]?.let {
+            call.parameters["phoneNumber"]?.let {
                 try {
                     val userId = call.principal<UserModel>()!!.id
                     val clients = clientUseCase.getClientByPhoneNumber(it, userId)
@@ -38,6 +38,7 @@ fun Route.clientRoute(clientUseCase: ClientUseCase) {
                 }
             }
         }
+
 
         post("/client") {
             call.receiveNullable<AddClientRequest>()?.let {
