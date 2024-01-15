@@ -16,22 +16,16 @@ class AppointmentRepositoryImpl : AppointmentRepository {
     override suspend fun insert(appointmentModel: AppointmentModel): AppointmentModel {
         dbQuery {
             println("-------------Insert-------------$appointmentModel")
-            AppointmentTable.insert { table ->
+            val id =AppointmentTable.insertAndGetId { table ->
                 table[owner] = appointmentModel.ownerId
                 table[workingDayId] = appointmentModel.workingDayId
                 table[startTime] = appointmentModel.startTime.toJavaLocalTime()
             }
 
-            appointmentModel.servicesId.map { serviceId ->
-                ServiceTable.select {
-                    ServiceTable.id eq serviceId
-                }.mapNotNull {
-                    rowToService(it)
-                }.single()
-            }.also { service ->
-                AppointmentServicesJunctionTable.batchInsert(service) {
-                    this[AppointmentServicesJunctionTable.appointment] = appointmentModel.id
-                    this[AppointmentServicesJunctionTable.service] = it.id
+            appointmentModel.servicesId.forEach {
+                AppointmentServicesJunctionTable.insert { table ->
+                    table[appointment] = id.value
+                    table[service] = it
                 }
             }
         }
