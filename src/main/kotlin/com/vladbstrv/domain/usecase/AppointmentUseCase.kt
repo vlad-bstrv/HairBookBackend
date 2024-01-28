@@ -7,5 +7,6 @@ class AppointmentUseCase(private val repository: AppointmentRepository) {
 
     suspend fun insert(appointmentModel: AppointmentModel) = repository.insert(appointmentModel)
 
-    suspend fun getById(id: Int) = repository.getById(id)
+    suspend fun getById(id: Int) = repository.getAll(id)
+
 }

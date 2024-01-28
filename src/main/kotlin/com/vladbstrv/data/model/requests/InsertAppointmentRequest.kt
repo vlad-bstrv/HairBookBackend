@@ -8,7 +8,7 @@ import kotlinx.serialization.Serializable
 data class InsertAppointmentRequest (
     val id: Int = 0,
     val workingDayId: Int,
-    val servicesId: List<Int>,
+    val servicesId: MutableList<Int>,
     val startTime: LocalTime
 )
 

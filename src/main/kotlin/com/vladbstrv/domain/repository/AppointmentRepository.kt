@@ -6,5 +6,5 @@ interface AppointmentRepository {
 
     suspend fun insert(appointmentModel: AppointmentModel): AppointmentModel
 
-    suspend fun getById(id: Int): List<AppointmentModel>
+    suspend fun getAll(ownerId: Int): List<AppointmentModel>
 }

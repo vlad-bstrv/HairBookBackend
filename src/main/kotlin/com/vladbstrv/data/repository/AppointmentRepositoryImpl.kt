@@ -16,7 +16,7 @@ class AppointmentRepositoryImpl : AppointmentRepository {
     override suspend fun insert(appointmentModel: AppointmentModel): AppointmentModel {
         dbQuery {
             println("-------------Insert-------------$appointmentModel")
-            val id =AppointmentTable.insertAndGetId { table ->
+            val id = AppointmentTable.insertAndGetId { table ->
                 table[owner] = appointmentModel.ownerId
                 table[workingDayId] = appointmentModel.workingDayId
                 table[startTime] = appointmentModel.startTime.toJavaLocalTime()
@@ -32,53 +32,51 @@ class AppointmentRepositoryImpl : AppointmentRepository {
         return appointmentModel
     }
 
-    override suspend fun getById(id: Int): List<AppointmentModel> = dbQuery {
-        AppointmentTable
+    override suspend fun getAll(ownerId: Int): List<AppointmentModel> = dbQuery {
+        val result = AppointmentTable
             .join(AppointmentServicesJunctionTable, JoinType.INNER, additionalConstraint = {
                 AppointmentTable.id eq AppointmentServicesJunctionTable.appointment
             })
             .join(ServiceTable, JoinType.INNER, additionalConstraint = {
                 AppointmentServicesJunctionTable.service eq ServiceTable.id
             })
-            .selectAll()
-            .mapNotNull {
-                AppointmentModel(
-                    id = it[AppointmentTable.id].value,
-                    ownerId = it[AppointmentTable.owner],
-                    workingDayId = it[AppointmentTable.workingDayId],
-                    servicesId = listOf(it[AppointmentServicesJunctionTable.service]),
-                    startTime = it[AppointmentTable.startTime].toKotlinLocalTime()
-                )
+            .select{
+                AppointmentTable.owner eq ownerId
             }
+            .mapNotNull {
+                rowToAppointment(it)
+            }
+        groupAppointment(result)
     }
 
-    suspend fun findAll(): List<AppointmentModel> {
-        val dbQuery = dbQuery {
-            AppointmentTable.join(ServiceTable, JoinType.INNER, additionalConstraint = {
-                AppointmentTable.id eq ServiceTable.id
-            })
-                .selectAll()
-                .limit(20)
-                .map {
-                    println(it)
-                }
-        }
-        return listOf()
-    }
-
-    private fun rowToService(row: ResultRow?): ServiceModel? {
+    private fun rowToAppointment(row: ResultRow?): AppointmentModel? {
         if (row == null) return null
 
-        val time = row.toString().substringAfter("time=").dropLast(3)
-
-        val serviceModelTimeString = ServiceModel(
-            id = row[ServiceTable.id],
-            owner = row[ServiceTable.owner],
-            name = row[ServiceTable.name],
-            price = row[ServiceTable.price],
-            time = LocalTime.parse(time).toKotlinLocalTime(),
+        val appointment = AppointmentModel(
+            id = row[AppointmentTable.id].value,
+            ownerId = row[AppointmentTable.owner],
+            workingDayId = row[AppointmentTable.workingDayId],
+            servicesId = mutableListOf(row[AppointmentServicesJunctionTable.service]),
+            startTime = row[AppointmentTable.startTime].toKotlinLocalTime()
         )
-        return serviceModelTimeString
+        return appointment
+    }
+
+    private fun groupAppointment(list: List<AppointmentModel>): List<AppointmentModel> {
+        val newList = mutableListOf<AppointmentModel>()
+        list.forEach { oldModel ->
+            if (newList.none { it.id == oldModel.id }) newList.add(oldModel)
+
+            for (model in newList) {
+                if (model.id == oldModel.id) {
+                    model.servicesId.addAll(oldModel.servicesId)
+                    val distinct = model.servicesId.distinct()
+                    model.servicesId.clear()
+                    model.servicesId.addAll(distinct)
+                }
+            }
+        }
+        return newList
     }
 }
 

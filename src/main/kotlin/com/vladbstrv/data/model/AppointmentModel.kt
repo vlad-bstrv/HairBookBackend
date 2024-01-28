@@ -8,6 +8,6 @@ data class AppointmentModel(
     val id: Int = 0,
     val ownerId: Int = 0,
     val workingDayId: Int = 0,
-    val servicesId: List<Int> = listOf(),
+    val servicesId: MutableList<Int> = mutableListOf(),
     val startTime: LocalTime
 )

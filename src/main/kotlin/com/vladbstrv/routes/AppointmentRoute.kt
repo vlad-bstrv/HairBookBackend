@@ -22,7 +22,6 @@ fun Route.appointmentRoute(appointmentUseCase: AppointmentUseCase) {
                 text = "missing parameters",
                 status = HttpStatusCode.BadRequest
             )
-            println("----------------------------${appointment.toModel(call.principal<UserModel>()!!.id)}")
             val appointmentResponse = appointmentUseCase.insert(appointment.toModel(call.principal<UserModel>()!!.id))
 
             call.respond(
@@ -31,16 +30,15 @@ fun Route.appointmentRoute(appointmentUseCase: AppointmentUseCase) {
             )
         }
 
-        get("/appointment/{id}") {
-            call.request.queryParameters["id"]?.let {
-                try {
-                    val userId = call.principal<UserModel>()!!.id
-                    val appointment = appointmentUseCase.getById(it.toInt())
-                    call.respond(HttpStatusCode.OK, appointment)
-                } catch (e: Exception) {
-                    call.respond(HttpStatusCode.Conflict, BaseResponse(false, e.message ?: Constants.Error.GENERAL))
-                }
+        get("/appointment") {
+            try {
+                val userId = call.principal<UserModel>()!!.id
+                val appointment = appointmentUseCase.getById(userId)
+                call.respond(HttpStatusCode.OK, appointment)
+            } catch (e: Exception) {
+                call.respond(HttpStatusCode.Conflict, BaseResponse(false, e.message ?: Constants.Error.GENERAL))
             }
+
         }
     }
 }
