@@ -31,7 +31,6 @@ object DatabaseFactory {
                 WorkingDayTable,
                 AppointmentTable,
                 AppointmentServicesJunctionTable,
-                TestTestTable
             )
         }
     }

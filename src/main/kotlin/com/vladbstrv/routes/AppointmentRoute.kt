@@ -32,7 +32,7 @@ fun Route.appointmentRoute(appointmentUseCase: AppointmentUseCase) {
         }
 
         get("/appointment/{id}") {
-            call.request.queryParameters["id"]?.let {
+            call.parameters["id"]?.let {
                 try {
                     val userId = call.principal<UserModel>()!!.id
                     val appointment = appointmentUseCase.getById(it.toInt())
