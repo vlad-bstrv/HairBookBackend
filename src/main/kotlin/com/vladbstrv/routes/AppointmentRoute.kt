@@ -16,29 +16,32 @@ import io.ktor.server.routing.*
 fun Route.appointmentRoute(appointmentUseCase: AppointmentUseCase) {
 
     authenticate("jwt") {
+        route("/appointment") {
 
-        post("/appointment") {
-            val appointment = call.receiveNullable<InsertAppointmentRequest>() ?: return@post call.respondText(
-                text = "missing parameters",
-                status = HttpStatusCode.BadRequest
-            )
-            val appointmentResponse = appointmentUseCase.insert(appointment.toModel(call.principal<UserModel>()!!.id))
+            post {
+                val appointment = call.receiveNullable<InsertAppointmentRequest>() ?: return@post call.respondText(
+                    text = "missing parameters",
+                    status = HttpStatusCode.BadRequest
+                )
+                val appointmentResponse =
+                    appointmentUseCase.insert(appointment.toModel(call.principal<UserModel>()!!.id))
 
-            call.respond(
-                message = appointmentResponse,
-                status = HttpStatusCode.OK
-            )
-        }
-
-        get("/appointment") {
-            try {
-                val userId = call.principal<UserModel>()!!.id
-                val appointment = appointmentUseCase.getById(userId)
-                call.respond(HttpStatusCode.OK, appointment)
-            } catch (e: Exception) {
-                call.respond(HttpStatusCode.Conflict, BaseResponse(false, e.message ?: Constants.Error.GENERAL))
+                call.respond(
+                    message = appointmentResponse,
+                    status = HttpStatusCode.OK
+                )
             }
 
+            get {
+                try {
+                    val userId = call.principal<UserModel>()!!.id
+                    val appointment = appointmentUseCase.getById(userId)
+                    call.respond(HttpStatusCode.OK, appointment)
+                } catch (e: Exception) {
+                    call.respond(HttpStatusCode.Conflict, BaseResponse(false, e.message ?: Constants.Error.GENERAL))
+                }
+
+            }
         }
     }
 }
