@@ -61,13 +61,47 @@ class AppointmentRepositoryImpl : AppointmentRepository {
             .mapNotNull {
                 rowToAppointment(it)
             }
-        println("result ${groupAppointment(result).first()}")
         groupAppointment(result).first()
 
     }
 
-    override suspend fun update(appointmentModel: AppointmentModel, ownerId: Int): AppointmentModel {
-        TODO("Not yet implemented")
+    override suspend fun update(appointmentModel: AppointmentModel): AppointmentModel {
+        val result = dbQuery {
+            AppointmentTable.update(
+                where = {
+                    AppointmentTable.id.eq(appointmentModel.id) and AppointmentTable.owner.eq(appointmentModel.ownerId)
+                }
+            ) {
+                it[owner] = appointmentModel.ownerId
+                it[workingDayId] = appointmentModel.workingDayId
+                it[startTime] = appointmentModel.startTime.toJavaLocalTime()
+            }
+
+            AppointmentServicesJunctionTable.deleteWhere {
+                appointment eq appointmentModel.id
+            }
+
+            appointmentModel.servicesId.forEach { serviceId ->
+                AppointmentServicesJunctionTable.insert {
+                    it[appointment] = appointmentModel.id
+                    it[service] = serviceId
+                }
+            }
+            AppointmentTable
+                .join(AppointmentServicesJunctionTable, JoinType.INNER, additionalConstraint = {
+                    AppointmentTable.id eq AppointmentServicesJunctionTable.appointment
+                })
+                .join(ServiceTable, JoinType.INNER, additionalConstraint = {
+                    AppointmentServicesJunctionTable.service eq ServiceTable.id
+                })
+                .select {
+                    (AppointmentTable.owner eq appointmentModel.ownerId) and (AppointmentTable.id eq appointmentModel.id)
+                }
+                .mapNotNull {
+                    rowToAppointment(it)
+                }
+        }
+        return groupAppointment(result).first()
     }
 
     override suspend fun delete(id: Int, ownerId: Int): Boolean {
