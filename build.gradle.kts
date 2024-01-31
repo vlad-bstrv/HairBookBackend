@@ -8,6 +8,8 @@ val h2_version: String by project
 val postgres_version: String by project
 val commons_codec_version: String by project
 val hikari_version: String by project
+val koin_version: String by project
+
 
 plugins {
     kotlin("jvm") version "1.9.22"
@@ -53,4 +55,10 @@ dependencies {
     implementation("com.zaxxer:HikariCP:$hikari_version")
 
     implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.5.0")
+
+    //koin
+    implementation("io.insert-koin:koin-ktor:$koin_version")
+    testImplementation("io.insert-koin:koin-test:$koin_version")
+    implementation("io.insert-koin:koin-logger-slf4j:$koin_version")
+
 }
