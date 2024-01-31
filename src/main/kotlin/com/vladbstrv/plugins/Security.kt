@@ -4,8 +4,11 @@ import com.vladbstrv.domain.usecase.UserUseCase
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.auth.jwt.*
+import org.koin.ktor.ext.inject
 
-fun Application.configureSecurity(userUseCase: UserUseCase) {
+fun Application.configureSecurity() {
+
+    val userUseCase by inject<UserUseCase>()
 
     authentication {
         jwt("jwt") {
