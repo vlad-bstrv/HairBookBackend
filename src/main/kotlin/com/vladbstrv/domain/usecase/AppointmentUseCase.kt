@@ -13,4 +13,6 @@ class AppointmentUseCase(private val repository: AppointmentRepository) {
 
     suspend fun delete(id: Int, ownerId: Int) = repository.delete(id, ownerId)
 
+    suspend fun update(appointmentModel: AppointmentModel) = repository.update(appointmentModel)
+
 }

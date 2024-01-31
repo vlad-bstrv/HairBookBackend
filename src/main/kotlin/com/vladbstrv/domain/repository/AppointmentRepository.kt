@@ -10,7 +10,7 @@ interface AppointmentRepository {
 
     suspend fun getById(id: Int, ownerId: Int): AppointmentModel
 
-    suspend fun update(appointmentModel: AppointmentModel, ownerId: Int): AppointmentModel
+    suspend fun update(appointmentModel: AppointmentModel): AppointmentModel
     suspend fun delete(id: Int, ownerId: Int): Boolean
 
 }

@@ -67,6 +67,27 @@ fun Route.appointmentRoute(appointmentUseCase: AppointmentUseCase) {
                 )
             }
 
+            put {
+                val appointment = call.receiveNullable<InsertAppointmentRequest>() ?: return@put call.respondText(
+                    text = "missing parameters",
+                    status = HttpStatusCode.BadRequest
+                )
+
+                val ownerId = call.principal<UserModel>()?.id ?: return@put call.respondText(
+                    "error principal",
+                    status = HttpStatusCode.BadRequest
+                )
+
+                val updateResponse = appointmentUseCase.update(
+                    appointment.toModel(ownerId)
+                )
+
+                call.respond(
+                    message = updateResponse,
+                    status = HttpStatusCode.OK
+                )
+            }
+
             delete("/{id}") {
                 val idString = call.parameters["id"] ?: return@delete call.respondText(
                     "Missing id",
