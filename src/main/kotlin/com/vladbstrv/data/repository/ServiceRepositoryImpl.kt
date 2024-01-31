@@ -21,6 +21,16 @@ class ServiceRepositoryImpl : ServiceRepository {
                 }
         }
 
+    override suspend fun getById(userId: Int, serviceId: Int) = dbQuery {
+            ServiceTable.select {
+                ServiceTable.owner.eq(userId) and ServiceTable.id.eq(serviceId)
+            }
+                .mapNotNull {
+                    rowToService(it)
+                }
+                .single()
+        }
+
 
     override suspend fun insertService(service: ServiceModel)  {
         dbQuery{
