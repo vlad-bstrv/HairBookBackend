@@ -28,6 +28,30 @@ fun Route.serviceRoute(serviceUseCase: ServiceUseCase) {
                 }
             }
 
+            get("/{id}") {
+                val idString = call.parameters["id"] ?: return@get call.respondText(
+                    "Missing id",
+                    status = HttpStatusCode.BadRequest
+                )
+
+                val id = idString.toIntOrNull() ?: return@get call.respondText(
+                    "id is not digits",
+                    status = HttpStatusCode.BadRequest
+                )
+
+                val ownerId = call.principal<UserModel>()?.id ?: return@get call.respondText(
+                    "error principal",
+                    status = HttpStatusCode.BadRequest
+                )
+
+                val serviceResponse = serviceUseCase.getServiceById(serviceId = id, ownerId = ownerId)
+
+                call.respond(
+                    message =  serviceResponse,
+                    status =  HttpStatusCode.OK
+                )
+            }
+
             post {
                 call.receiveNullable<AddServiceRequest>()?.let {
                     try {

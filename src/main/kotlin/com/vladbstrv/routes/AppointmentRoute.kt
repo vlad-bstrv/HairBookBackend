@@ -35,12 +35,60 @@ fun Route.appointmentRoute(appointmentUseCase: AppointmentUseCase) {
             get {
                 try {
                     val userId = call.principal<UserModel>()!!.id
-                    val appointment = appointmentUseCase.getById(userId)
+                    val appointment = appointmentUseCase.getAll(userId)
                     call.respond(HttpStatusCode.OK, appointment)
                 } catch (e: Exception) {
                     call.respond(HttpStatusCode.Conflict, BaseResponse(false, e.message ?: Constants.Error.GENERAL))
                 }
 
+            }
+
+            get("/{id}") {
+                val idString = call.parameters["id"] ?: return@get call.respondText(
+                    "Missing id",
+                    status = HttpStatusCode.BadRequest
+                )
+
+                val id = idString.toIntOrNull() ?: return@get call.respondText(
+                    "id is not digits",
+                    status = HttpStatusCode.BadRequest
+                )
+
+                val ownerId = call.principal<UserModel>()?.id ?: return@get call.respondText(
+                    "error principal",
+                    status = HttpStatusCode.BadRequest
+                )
+
+                val appointmentResponse = appointmentUseCase.getById(id, ownerId)
+
+                call.respond(
+                    message = appointmentResponse,
+                    status = HttpStatusCode.OK
+                )
+            }
+
+            delete("/{id}") {
+                val idString = call.parameters["id"] ?: return@delete call.respondText(
+                    "Missing id",
+                    status = HttpStatusCode.BadRequest
+                )
+
+                val id = idString.toIntOrNull() ?: return@delete call.respondText(
+                    "id is not digits",
+                    status = HttpStatusCode.BadRequest
+                )
+
+                val ownerId = call.principal<UserModel>()?.id ?: return@delete call.respondText(
+                    "error principal",
+                    status = HttpStatusCode.BadRequest
+                )
+
+                val deleteResult = appointmentUseCase.delete(id, ownerId)
+
+                call.respond(
+                    message = deleteResult,
+                    status = HttpStatusCode.OK
+                )
             }
         }
     }

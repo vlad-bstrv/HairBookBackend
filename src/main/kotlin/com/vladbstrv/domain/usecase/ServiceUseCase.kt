@@ -14,5 +14,9 @@ class ServiceUseCase(
     suspend fun updateService(serviceModel: ServiceModel, ownerId: Int) = serviceRepository
         .updateService(serviceModel, ownerId)
 
-    suspend fun deleteService(serviceId: Int, ownedId: Int): Boolean = serviceRepository.deleteService(serviceId, ownedId)
+    suspend fun deleteService(serviceId: Int, ownedId: Int): Boolean =
+        serviceRepository.deleteService(serviceId, ownedId)
+
+    suspend fun getServiceById(serviceId: Int, ownerId: Int): ServiceModel =
+        serviceRepository.getById(serviceId = serviceId, userId = ownerId)
 }
